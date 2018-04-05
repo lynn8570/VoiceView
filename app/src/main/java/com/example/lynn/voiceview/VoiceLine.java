@@ -80,6 +80,7 @@ public class VoiceLine extends View {
 
                 try {
                     float result = (float) animation.getAnimatedValue();//0-1
+                    Log.i("onAnimationUpdate","result2="+result);
                     if(result<1){
                         mPositions[0]=result;
                         mPositions[1]=result+0.1f;
@@ -105,10 +106,26 @@ public class VoiceLine extends View {
         @Override
         public Float evaluate(float fraction, Float startValue, Float endValue) {
 
-            float result = endValue*fraction/100f;
-            Log.i("ValueAnimator","result2="+result);
+           // float result = endValue*fraction/100f;
+            float t = fraction;
+            float c = endValue - startValue;
+            float b = endValue;
+            Log.i("onAnimationUpdate","time="+t);
+            Log.i("onAnimationUpdate","c="+c);
+            Log.i("onAnimationUpdate","b="+b);
 
-            return result;
+            float result = 0f;
+            if (t < (1/2.75f)) {//f=0.36
+                result = c*(-7.5625f*t*t) + b;
+            } else if (t < (2/2.75f)) {//f=0.72727272
+                result =  c*(-7.5625f*(t-=(1.5f/2.75f))*t + .75f) + b;
+            } else if (t < (2.5/2.75)) {
+                result =  c*(-7.5625f*(t-=(2.25f/2.75f))*t + .9375f) + b;
+            } else {
+                result =  c*(-7.5625f*(t-=(2.625f/2.75f))*t + .984375f) + b;
+            }
+            Log.i("onAnimationUpdate","result1="+result);
+            return result/100f;
         }
     }
 }
