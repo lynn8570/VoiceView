@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.example.lynn.voiceview.MainActivity"
+    tools:showIn="@layout/activity_main"
+    android:background="@android:color/background_dark">
+
+    <com.example.lynn.voiceview.VoiceLine
+        android:id="@+id/voice_view"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:position_bg="0.4"
+        app:position_fr="0.5" />
+
+
+
+</android.support.constraint.ConstraintLayout>

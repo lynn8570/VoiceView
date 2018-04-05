@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="VoiceLine">
+        <attr name="position_bg" format="float"></attr>
+        <attr name="position_fr" format="float"></attr>
+    </declare-styleable>
+</resources>
