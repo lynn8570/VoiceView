@@ -28,6 +28,8 @@ public class VoiceLine extends View {
 
     private Paint mPaint;
 
+    private final float MAX_DB=200f;
+
     private float[] mPositions=new float[2];
     public VoiceLine(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -72,18 +74,19 @@ public class VoiceLine extends View {
     }
 
 
+
     public void startAnimation(){
-        ValueAnimator animator =  ValueAnimator.ofObject(new VoiceEvaluator(),0f,100f,50f,60f,20f,120f);
+        ValueAnimator animator =  ValueAnimator.ofObject(new VoiceEvaluator(),0f,50f,100f,0f,150f,210f);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
 
                 try {
                     float result = (float) animation.getAnimatedValue();//0-1
-                    Log.i("onAnimationUpdate","result2="+result);
+                    Log.i("onAnimationUpdate","result3="+result);
                     if(result<1){
-                        mPositions[0]=result;
-                        mPositions[1]=result+0.1f;
+                        mPositions[0]=result-0.1f;
+                        mPositions[1]=result;
                     }else{
                         mPositions[0]=0;
                         mPositions[1]=0;
@@ -96,7 +99,7 @@ public class VoiceLine extends View {
                 invalidate();
             }
         });
-        animator.setDuration(12000);
+        animator.setDuration(3000);
 
         animator.start();
     }
@@ -108,24 +111,26 @@ public class VoiceLine extends View {
 
            // float result = endValue*fraction/100f;
             float t = fraction;
-            float c = endValue - startValue;
-            float b = endValue;
+
             Log.i("onAnimationUpdate","time="+t);
-            Log.i("onAnimationUpdate","c="+c);
-            Log.i("onAnimationUpdate","b="+b);
 
             float result = 0f;
             if (t < (1/2.75f)) {//f=0.36
-                result = c*(-7.5625f*t*t) + b;
+                result = (7.5625f*t*t);
             } else if (t < (2/2.75f)) {//f=0.72727272
-                result =  c*(-7.5625f*(t-=(1.5f/2.75f))*t + .75f) + b;
+                result =  (7.5625f*(t-=(1.5f/2.75f))*t + .75f) ;//-7.5625*(x-0.54)*(x-0.54)+0.25
             } else if (t < (2.5/2.75)) {
-                result =  c*(-7.5625f*(t-=(2.25f/2.75f))*t + .9375f) + b;
+                result =  (7.5625f*(t-=(2.25f/2.75f))*t + .93755f);
             } else {
-                result =  c*(-7.5625f*(t-=(2.625f/2.75f))*t + .984375f) + b;
+                result =  (7.5625f*(t-=(2.625f/2.75f))*t + 0.984375f);
             }
             Log.i("onAnimationUpdate","result1="+result);
-            return result/100f;
+
+            startValue = startValue>MAX_DB?MAX_DB:startValue;
+            endValue = endValue>MAX_DB?MAX_DB:endValue;
+            result = startValue/MAX_DB+ result*(endValue-startValue)/MAX_DB;
+            Log.i("onAnimationUpdate","result 2="+result);
+            return 1-result;
         }
     }
 }
