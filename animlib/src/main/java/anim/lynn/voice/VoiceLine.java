@@ -1,4 +1,4 @@
-package com.example.lynn.voiceview;
+package anim.lynn.voice;
 
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
@@ -12,6 +12,8 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+
+import anim.lynn.com.voice.R;
 
 
 /**

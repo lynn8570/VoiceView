@@ -9,7 +9,7 @@
     tools:showIn="@layout/activity_main"
     android:background="@android:color/background_dark">
 
-    <com.example.lynn.voiceview.VoiceLine
+    <anim.lynn.voice.VoiceLine
         android:id="@+id/voice_view"
         android:layout_width="match_parent"
         android:layout_height="3dp"
