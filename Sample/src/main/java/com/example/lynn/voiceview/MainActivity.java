@@ -5,13 +5,14 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import anim.lynn.voice.VoiceLine;
 
 
 public class MainActivity extends AppCompatActivity {
-
+    VoiceLine voiceLine;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,11 +29,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+         voiceLine = findViewById(R.id.voice_view);
 
-
-        VoiceLine voiceLine = findViewById(R.id.voice_view);
-        voiceLine.startAnimation();
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        voiceLine.startRecord();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        voiceLine.stopRecord();
+    }
 }

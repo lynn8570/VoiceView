@@ -30,20 +30,42 @@ public class VoiceLine extends View {
 
     private Paint mPaint;
 
-    private final float MAX_DB=200f;
+    private final float MAX_DB = 60f; //正常交谈 60 分贝
 
-    private float[] mPositions=new float[2];
+    private float[] mPositions = new float[2];
+
+    private MicDBSampler micDBSampler;
+
     public VoiceLine(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.VoiceLine);
-        if(typedArray!=null){
-            mPositions[0]=typedArray.getFloat(R.styleable.VoiceLine_position_bg,0.2f);
-            mPositions[1]=typedArray.getFloat(R.styleable.VoiceLine_position_fr,1f);
+        if (typedArray != null) {
+            mPositions[0] = typedArray.getFloat(R.styleable.VoiceLine_position_bg, 0.2f);
+            mPositions[1] = typedArray.getFloat(R.styleable.VoiceLine_position_fr, 1f);
         }
 
+        micDBSampler = new MicDBSampler(100);
+        micDBSampler.setmVolumeListener(new MicDBSampler.CalculateVolumeListener() {
+            @Override
+            public void onCalculateVolume(final float volume) {
+                    postAnimation(volume);
+            }
+        });
+
+
     }
+
+    public void startRecord() {
+        micDBSampler.startRecording();
+    }
+
+    public void stopRecord() {
+        micDBSampler.stopRecording();
+    }
+
+
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -63,76 +85,87 @@ public class VoiceLine extends View {
         //改为使用渐变效果
 
 
-        int[] colors={getResources().getColor(R.color.voicebg),
+        int[] colors = {getResources().getColor(R.color.voicebg),
                 getResources().getColor(R.color.voicefr)};
 
-        Log.i("positions=","p="+mPositions[0]+","+mPositions[1]);
-        LinearGradient linearGradient = new LinearGradient(0,0,width/2,height/2,colors,mPositions, Shader.TileMode.MIRROR
+        //Log.i("positions=", "p=" + mPositions[0] + "," + mPositions[1]);
+        LinearGradient linearGradient = new LinearGradient(0, 0, width / 2, height / 2, colors, mPositions, Shader.TileMode.MIRROR
 
         );
         mPaint.setShader(linearGradient);
-        canvas.drawRect(0,0,width,height,mPaint);
+        canvas.drawRect(0, 0, width, height, mPaint);
 
     }
 
 
+    private float preValue=0;
 
-    public void startAnimation(){
-        ValueAnimator animator =  ValueAnimator.ofObject(new VoiceEvaluator(),0f,50f,100f,0f,150f,210f);
+    public void postAnimation(final float volumn){
+        Log.i("onAnimationUpdate", "volumn=" + volumn);
+        post(new Runnable() {
+            @Override
+            public void run() {
+                startAnimation(volumn);
+            }
+        });
+    }
+
+    public void startAnimation(float curValue) {
+        ValueAnimator animator = ValueAnimator.ofObject(new VoiceEvaluator(), preValue,curValue);
+        preValue = curValue;
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
 
                 try {
                     float result = (float) animation.getAnimatedValue();//0-1
-                    Log.i("onAnimationUpdate","result3="+result);
-                    if(result<1){
-                        mPositions[0]=result-0.1f;
-                        mPositions[1]=result;
-                    }else{
-                        mPositions[0]=0;
-                        mPositions[1]=0;
+                    //Log.i("onAnimationUpdate", "result3=" + result);
+                    if (result < 1) {
+                        mPositions[0] = result - 0.1f;
+                        mPositions[1] = result;
+                    } else {
+                        mPositions[0] = 0;
+                        mPositions[1] = 0;
                     }
 
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
                 invalidate();
             }
         });
-        animator.setDuration(3000);
-
+        animator.setDuration(1000);
         animator.start();
     }
 
-    public class VoiceEvaluator implements TypeEvaluator<Float>{
+    public class VoiceEvaluator implements TypeEvaluator<Float> {
 
         @Override
         public Float evaluate(float fraction, Float startValue, Float endValue) {
 
-           // float result = endValue*fraction/100f;
+            // float result = endValue*fraction/100f;
             float t = fraction;
 
-            Log.i("onAnimationUpdate","time="+t);
+           // Log.i("onAnimationUpdate", "time=" + t);
 
             float result = 0f;
-            if (t < (1/2.75f)) {//f=0.36
-                result = (7.5625f*t*t);
-            } else if (t < (2/2.75f)) {//f=0.72727272
-                result =  (7.5625f*(t-=(1.5f/2.75f))*t + .75f) ;//-7.5625*(x-0.54)*(x-0.54)+0.25
-            } else if (t < (2.5/2.75)) {
-                result =  (7.5625f*(t-=(2.25f/2.75f))*t + .93755f);
+            if (t < (1 / 2.75f)) {//f=0.36
+                result = (7.5625f * t * t);
+            } else if (t < (2 / 2.75f)) {//f=0.72727272
+                result = (7.5625f * (t -= (1.5f / 2.75f)) * t + .75f);//-7.5625*(x-0.54)*(x-0.54)+0.25
+            } else if (t < (2.5 / 2.75)) {
+                result = (7.5625f * (t -= (2.25f / 2.75f)) * t + .93755f);
             } else {
-                result =  (7.5625f*(t-=(2.625f/2.75f))*t + 0.984375f);
+                result = (7.5625f * (t -= (2.625f / 2.75f)) * t + 0.984375f);
             }
-            Log.i("onAnimationUpdate","result1="+result);
+            //Log.i("onAnimationUpdate", "result1=" + result);
 
-            startValue = startValue>MAX_DB?MAX_DB:startValue;
-            endValue = endValue>MAX_DB?MAX_DB:endValue;
-            result = startValue/MAX_DB+ result*(endValue-startValue)/MAX_DB;
-            Log.i("onAnimationUpdate","result 2="+result);
-            return 1-result;
+            startValue = startValue > MAX_DB ? MAX_DB : startValue;
+            endValue = endValue > MAX_DB ? MAX_DB : endValue;
+            result = startValue / MAX_DB + result * (endValue - startValue) / MAX_DB;
+           // Log.i("onAnimationUpdate", "result 2=" + result);
+            return 1 - result;
         }
     }
 }
