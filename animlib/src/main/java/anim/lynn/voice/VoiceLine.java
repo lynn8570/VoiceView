@@ -30,11 +30,12 @@ public class VoiceLine extends View {
 
     private Paint mPaint;
 
-    private final float MAX_DB = 60f; //正常交谈 60 分贝
+    private final float MAX_DB = 100f; //正常交谈 60 分贝
+    private final float MIN_DB = 40f;
 
     private float[] mPositions = new float[2];
 
-    private MicDBSampler micDBSampler;
+    private RecorderSampler micDBSampler;
 
     public VoiceLine(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -46,25 +47,26 @@ public class VoiceLine extends View {
             mPositions[1] = typedArray.getFloat(R.styleable.VoiceLine_position_fr, 1f);
         }
 
-        micDBSampler = new MicDBSampler(100);
-        micDBSampler.setmVolumeListener(new MicDBSampler.CalculateVolumeListener() {
+        // micDBSampler = new AudioRecorderSampler(100);
+
+        micDBSampler = new MediaRecorderSampler(100);
+        micDBSampler.setVolumeLister(new RecorderSampler.VolumeListener() {
             @Override
             public void onCalculateVolume(final float volume) {
-                    postAnimation(volume);
+                postAnimation(volume);
             }
         });
 
 
     }
 
-    public void startRecord() {
-        micDBSampler.startRecording();
+    public void startRecord(RecorderSampler.OnStartRecorderError callback) {
+        micDBSampler.startRecorder(callback);
     }
 
     public void stopRecord() {
-        micDBSampler.stopRecording();
+        micDBSampler.stopRecorder();
     }
-
 
 
     @Override
@@ -98,9 +100,9 @@ public class VoiceLine extends View {
     }
 
 
-    private float preValue=0;
+    private float preValue = 0;
 
-    public void postAnimation(final float volumn){
+    public void postAnimation(final float volumn) {
         Log.i("onAnimationUpdate", "volumn=" + volumn);
         post(new Runnable() {
             @Override
@@ -111,7 +113,7 @@ public class VoiceLine extends View {
     }
 
     public void startAnimation(float curValue) {
-        ValueAnimator animator = ValueAnimator.ofObject(new VoiceEvaluator(), preValue,curValue);
+        ValueAnimator animator = ValueAnimator.ofObject(new VoiceEvaluator(), preValue, curValue);
         preValue = curValue;
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -147,7 +149,7 @@ public class VoiceLine extends View {
             // float result = endValue*fraction/100f;
             float t = fraction;
 
-           // Log.i("onAnimationUpdate", "time=" + t);
+            // Log.i("onAnimationUpdate", "time=" + t);
 
             float result = 0f;
             if (t < (1 / 2.75f)) {//f=0.36
@@ -161,10 +163,15 @@ public class VoiceLine extends View {
             }
             //Log.i("onAnimationUpdate", "result1=" + result);
 
+            //偏移四十，根据实际声音微调
+            startValue = startValue - MIN_DB;
+            endValue = endValue - MIN_DB;
+
             startValue = startValue > MAX_DB ? MAX_DB : startValue;
             endValue = endValue > MAX_DB ? MAX_DB : endValue;
+
             result = startValue / MAX_DB + result * (endValue - startValue) / MAX_DB;
-           // Log.i("onAnimationUpdate", "result 2=" + result);
+            // Log.i("onAnimationUpdate", "result 2=" + result);
             return 1 - result;
         }
     }

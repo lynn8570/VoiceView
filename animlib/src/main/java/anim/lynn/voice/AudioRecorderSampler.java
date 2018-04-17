@@ -1,16 +1,9 @@
 package anim.lynn.voice;
 
-import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.util.AttributeSet;
-import android.util.Log;
-import android.view.View;
 
-import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -18,39 +11,21 @@ import java.util.TimerTask;
  * Created by zowee-laisc on 2018/4/13.
  */
 
-public class MicDBSampler {
+public class AudioRecorderSampler extends RecorderSampler {
 
     public static final String TAG = "MicStatusRecorderView";
     private static final int RECORDING_SAMPLE_RATE = 44100;
 
     private AudioRecord mAudioRecord;
-    private boolean mIsRecording;
+
     private int mBufSize;
 
 
-    private CalculateVolumeListener mVolumeListener;
-    private int mSamplingInterval = 100;
-    private Timer mTimer;
+    public AudioRecorderSampler(int samplingInterval) {
+        super(samplingInterval);
 
-
-    public MicDBSampler(int samplingInterval) {
-
-        this.mSamplingInterval = samplingInterval;
     }
 
-    public void setmVolumeListener(CalculateVolumeListener mVolumeListener) {
-        this.mVolumeListener = mVolumeListener;
-    }
-
-
-    /**
-     * getter isRecording
-     *
-     * @return true:recording, false:not recording
-     */
-    public boolean isRecording() {
-        return mIsRecording;
-    }
 
     private void initAudioRecord() {
         int bufferSize = AudioRecord.getMinBufferSize(
@@ -73,10 +48,8 @@ public class MicDBSampler {
 
     }
 
-    /**
-     * start AudioRecord.read
-     */
-    public void startRecording() {
+    @Override
+    void startRecorder(OnStartRecorderError callback) {
         initAudioRecord();
         mTimer = new Timer();
         mAudioRecord.startRecording();
@@ -84,15 +57,11 @@ public class MicDBSampler {
         runRecording();
     }
 
-    /**
-     * stop AudioRecord.read
-     */
-    public void stopRecording() {
+    @Override
+    void stopRecorder() {
         mIsRecording = false;
         mTimer.cancel();
-
         release();
-
     }
 
     private void runRecording() {
@@ -107,13 +76,12 @@ public class MicDBSampler {
                 }
                 mAudioRecord.read(buf, 0, mBufSize);
 
+
                 float decibel = calculateDecibel(buf);
 
 
                 // callback for return input value
-                if (mVolumeListener != null) {
-                    mVolumeListener.onCalculateVolume(decibel);
-                }
+                onCalculateVolume(decibel);
             }
         }, 0, mSamplingInterval);
     }
@@ -131,20 +99,12 @@ public class MicDBSampler {
      * release member object
      */
     public void release() {
-        stopRecording();
+
         mAudioRecord.release();
         mAudioRecord = null;
         mTimer = null;
     }
 
-    public interface CalculateVolumeListener {
 
-        /**
-         * calculate input volume
-         *
-         * @param volume mic-input volume
-         */
-        void onCalculateVolume(float volume);
-    }
 }
 

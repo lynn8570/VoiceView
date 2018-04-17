@@ -7,12 +7,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
+import anim.lynn.voice.RecorderSampler;
 import anim.lynn.voice.VoiceLine;
 
 
 public class MainActivity extends AppCompatActivity {
     VoiceLine voiceLine;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-         voiceLine = findViewById(R.id.voice_view);
+        voiceLine = findViewById(R.id.voice_view);
 
 
     }
@@ -37,7 +40,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        voiceLine.startRecord();
+        voiceLine.startRecord(new RecorderSampler.OnStartRecorderError() {
+            @Override
+            public void onError(int msg) {
+                Toast.makeText(MainActivity.this, "error", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override
