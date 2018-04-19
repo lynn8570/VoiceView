@@ -201,7 +201,7 @@ public class VoiceWave extends View {
         super.onDraw(canvas);
         float boaderwidth = DEFAULT_BOARD_WIDTH;
 
-        canvas.drawCircle(getWidth() / 2f, getHeight() / 2f, (getWidth() - boaderwidth) / 2f - 1f, mBoarderPaint);//画边框
+        //canvas.drawCircle(getWidth() / 2f, getHeight() / 2f, (getWidth() - boaderwidth) / 2f - 1f, mBoarderPaint);//画边框
         canvas.drawCircle(getWidth() / 2f, getHeight() / 2f, getWidth() / 2f - boaderwidth, mBgPaint);//画圆形背景
 
 
@@ -209,7 +209,7 @@ public class VoiceWave extends View {
             if (mWavePaint.getShader() == null) {
                 mWavePaint.setShader(mWaveShader);
             }
-            
+
             float dx = mWaveXshift * getWidth();
             float dy = mWaveYshift * getWidth();
             mShaderMatrix.setTranslate(dx, dy);//平移波浪，实现推进效果

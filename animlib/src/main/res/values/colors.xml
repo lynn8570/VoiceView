@@ -4,6 +4,6 @@
     <color name="voicebg">#ff2445f7</color>
     <color name="voicefr">#ff1afffb</color>
 
-    <color name="wavefr">#ffffff00</color>
-    <color name="wavebg">#4dffff00</color>
+    <color name="wavefr">#ff1afffb</color>
+    <color name="wavebg">#4d1afffb</color>
 </resources>
