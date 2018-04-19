@@ -103,7 +103,7 @@ public class VoiceLine extends View {
     private float preValue = 0;
 
     public void postAnimation(final float volumn) {
-        Log.i("onAnimationUpdate", "volumn=" + volumn);
+        //Log.i("onAnimationUpdate", "volumn=" + volumn);
         post(new Runnable() {
             @Override
             public void run() {

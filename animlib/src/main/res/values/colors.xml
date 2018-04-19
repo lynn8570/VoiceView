@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="voicebg">#2445f7</color>
-    <color name="voicefr">#1afffb</color>
+    <color name="voicebg">#ff2445f7</color>
+    <color name="voicefr">#ff1afffb</color>
+
+    <color name="wavefr">#ffffff00</color>
+    <color name="wavebg">#4dffff00</color>
 </resources>

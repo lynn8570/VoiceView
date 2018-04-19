@@ -47,7 +47,7 @@ public abstract class RecorderSampler {
     }
 
     protected void onCalculateVolume(float volume) {
-        Log.i("Recorder", "onCalculateVolume =" + volume);
+        //Log.i("Recorder", "onCalculateVolume =" + volume);
         if (mListener != null) {
             mListener.onCalculateVolume(volume);
         }
