@@ -159,10 +159,30 @@ public class VoiceWave extends View {
         waveXshiftAnimator.setRepeatCount(ValueAnimator.INFINITE);
         waveXshiftAnimator.setDuration(2000);
         waveXshiftAnimator.setInterpolator(new LinearInterpolator());
+
+        ObjectAnimator waveYshiftAnimator = ObjectAnimator.ofFloat(this, "waveYshift", 0f, 0.5f,0f,-0.5f,0f);
+        waveYshiftAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        waveYshiftAnimator.setDuration(20000);
+        waveYshiftAnimator.setInterpolator(new LinearInterpolator());
         mAnimatorset = new AnimatorSet();
-        mAnimatorset.play(waveXshiftAnimator);
+        mAnimatorset.playTogether(waveXshiftAnimator,waveYshiftAnimator);
 
     }
+
+    public float getWaveYshift() {
+        return mWaveYshift;
+    }
+
+    public void setWaveYshift(float mWaveYshift) {
+        if(this.mWaveYshift!=mWaveYshift){
+
+            this.mWaveYshift = mWaveYshift;
+            invalidate();
+        }
+
+    }
+
+    private float mWaveYshift=0;
 
     private void startAnimation() {
         if (mAnimatorset != null) {
@@ -189,10 +209,10 @@ public class VoiceWave extends View {
             if (mWavePaint.getShader() == null) {
                 mWavePaint.setShader(mWaveShader);
             }
-            Log.i("linlian2", "mWaveXshift=" + mWaveXshift);
-            Log.i("linlian2", "getWidth=" + getWidth() + " getHeight=" + getHeight());
+            
             float dx = mWaveXshift * getWidth();
-            mShaderMatrix.setTranslate(dx, 0);//平移波浪，实现推进效果
+            float dy = mWaveYshift * getWidth();
+            mShaderMatrix.setTranslate(dx, dy);//平移波浪，实现推进效果
 
             mWaveShader.setLocalMatrix(mShaderMatrix);
         } else {
