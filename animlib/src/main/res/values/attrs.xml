@@ -4,4 +4,9 @@
         <attr name="position_bg" format="float"></attr>
         <attr name="position_fr" format="float"></attr>
     </declare-styleable>
+
+    <declare-styleable name="VoiceSvg">
+        <attr name="svg_file" format="reference"></attr>
+
+    </declare-styleable>
 </resources>
