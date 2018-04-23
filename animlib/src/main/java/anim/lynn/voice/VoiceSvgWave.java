@@ -1,11 +1,10 @@
 package anim.lynn.voice;
 
-import android.animation.AnimatorSet;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -18,7 +17,6 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.AnimationSet;
 import android.view.animation.LinearInterpolator;
 
 import com.caverock.androidsvg.PreserveAspectRatio;
@@ -34,7 +32,7 @@ import anim.lynn.com.voice.R;
  * Created by zowee-laisc on 2018/4/19.
  */
 
-public class VoiceSvg extends View {
+public class VoiceSvgWave extends View {
     private int mSvgResourceId;
     private SVG mSvg;
     private Thread mLoader;
@@ -47,16 +45,17 @@ public class VoiceSvg extends View {
     private List<SvgPath> mPaths = new ArrayList<>();
 
 
+
     private float mSvgProgress = 0.5f;
+
+    private WaveTools mWaveTools;
 
     public float getSvgProgress() {
         return mSvgProgress;
     }
 
     public void setSvgProgress(float progress) {
-        Log.i("linlian", "setProgress=" + progress);
         if (this.mSvgProgress != progress) {
-
             this.mSvgProgress = progress;
             updatePathsPhaseLocked();
             invalidate();
@@ -64,13 +63,22 @@ public class VoiceSvg extends View {
 
     }
 
+    private boolean isPathFinished=false;
 
     private ObjectAnimator svgPathProgressAnimator;
     private void initAnimation() {
-        svgPathProgressAnimator = ObjectAnimator.ofFloat(VoiceSvg.this, "svgProgress", 0f, 1f);
+        svgPathProgressAnimator = ObjectAnimator.ofFloat(VoiceSvgWave.this, "svgProgress", 0f, 1f);
         svgPathProgressAnimator.setRepeatCount(0);
         svgPathProgressAnimator.setDuration(5000);
         svgPathProgressAnimator.setInterpolator(new LinearInterpolator());
+        svgPathProgressAnimator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                //波浪动画
+                isPathFinished = true;
+            }
+        });
 
     }
 
@@ -91,19 +99,22 @@ public class VoiceSvg extends View {
         if (svgPathProgressAnimator != null) {
             svgPathProgressAnimator.start();
         }
+        mWaveTools.startAnimation();
     }
 
     public void cancelAnimation() {
         if (svgPathProgressAnimator != null) {
             svgPathProgressAnimator.cancel();
         }
+
+        mWaveTools.startAnimation();
     }
 
-    public VoiceSvg(Context context, @Nullable AttributeSet attrs) {
+    public VoiceSvgWave(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.VoiceSvg);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.VoiceSvgWave);
         if (typedArray != null) {
-            mSvgResourceId = typedArray.getResourceId(R.styleable.VoiceSvg_svg_file, 0);
+            mSvgResourceId = typedArray.getResourceId(R.styleable.VoiceSvgWave_svg_file, 0);
         }
         typedArray.recycle();
         init();
@@ -117,6 +128,8 @@ public class VoiceSvg extends View {
 
 
         startLoadSvg(w, h);
+
+        mWaveTools.updateWaveShader();
     }
 
     @Override
@@ -124,6 +137,7 @@ public class VoiceSvg extends View {
         super.onDraw(canvas);
 
         //canvas.drawRect(0, 0, mWidth, mHeight, mSourcePaint);
+
 
         synchronized (mSvgLock) {
             canvas.translate(getPaddingLeft(), getPaddingTop());
@@ -133,14 +147,25 @@ public class VoiceSvg extends View {
                 final Path path = svgPath.path;
 
                 canvas.drawPath(path, mSourcePaint);
+
+                if(isPathFinished){
+
+                    canvas.drawPath(path,mWaveTools.getWavePaint());
+                }
             }
         }
+
+
     }
+
+
 
     private void init() {
         mSourcePaint.setStyle(Paint.Style.STROKE);
         mSourcePaint.setColor(getResources().getColor(R.color.voicefr));
         mSourcePaint.setStrokeWidth(2);
+
+        mWaveTools = new WaveTools(VoiceSvgWave.this);
         initAnimation();
     }
 

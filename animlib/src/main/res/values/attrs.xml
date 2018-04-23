@@ -5,7 +5,7 @@
         <attr name="position_fr" format="float"></attr>
     </declare-styleable>
 
-    <declare-styleable name="VoiceSvg">
+    <declare-styleable name="VoiceSvgWave">
         <attr name="svg_file" format="reference"></attr>
 
     </declare-styleable>

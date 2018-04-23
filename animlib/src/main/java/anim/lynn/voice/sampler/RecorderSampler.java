@@ -1,7 +1,9 @@
-package anim.lynn.voice;
+package anim.lynn.voice.sampler;
 
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 
 /**
@@ -10,7 +12,9 @@ import java.util.Timer;
 
 public abstract class RecorderSampler {
 
-    protected VolumeListener mListener;
+
+    private List<VolumeListener> mListeners = new ArrayList<>();
+
     protected OnStartRecorderError mCallback;
     protected int mSamplingInterval = 100;
     protected boolean mIsRecording;
@@ -22,9 +26,9 @@ public abstract class RecorderSampler {
 
     }
 
-    abstract void startRecorder(OnStartRecorderError callback);
+    public abstract void startRecorder(OnStartRecorderError callback);
 
-    abstract void stopRecorder();
+    public abstract void stopRecorder();
 
     /**
      * getter isRecording
@@ -41,16 +45,17 @@ public abstract class RecorderSampler {
         }
     }
 
-    public void setVolumeLister(VolumeListener listener) {
-        this.mListener = listener;
+    public void addVolumeLister(VolumeListener listener) {
+        mListeners.add(listener);
 
     }
 
     protected void onCalculateVolume(float volume) {
         //Log.i("Recorder", "onCalculateVolume =" + volume);
-        if (mListener != null) {
-            mListener.onCalculateVolume(volume);
+        for (int i = 0; i < mListeners.size(); i++) {
+            mListeners.get(i).onCalculateVolume(volume);
         }
+
     }
 
     public interface OnStartRecorderError {

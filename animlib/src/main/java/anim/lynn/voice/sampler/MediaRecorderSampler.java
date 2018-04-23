@@ -1,4 +1,4 @@
-package anim.lynn.voice;
+package anim.lynn.voice.sampler;
 
 import android.media.MediaRecorder;
 import android.os.Environment;
@@ -43,7 +43,7 @@ public class MediaRecorderSampler extends RecorderSampler {
 
 
     @Override
-    void startRecorder(OnStartRecorderError callback) {
+    public void startRecorder(OnStartRecorderError callback) {
 
         mCallback = callback;
         if (!initTempfile()) {
@@ -95,7 +95,7 @@ public class MediaRecorderSampler extends RecorderSampler {
 
 
     @Override
-    void stopRecorder() {
+    public void stopRecorder() {
         mMediaRecorder.stop();
         mIsRecording = false;
         mMediaRecorder.release();

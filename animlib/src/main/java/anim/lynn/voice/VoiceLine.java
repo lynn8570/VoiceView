@@ -10,23 +10,19 @@ import android.graphics.Paint;
 import android.graphics.Shader;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 import anim.lynn.com.voice.R;
+import anim.lynn.voice.sampler.MediaRecorderSampler;
+import anim.lynn.voice.sampler.RecorderSampler;
 
 
 /**
  * Created by lynn on 2018/4/5.
  */
 
-public class VoiceLine extends View {
+public class VoiceLine extends VoiceView {
 
-
-    private int mWidth;
-    private int mHeight;
-
-    private float mStrength;
 
     private Paint mPaint;
 
@@ -35,7 +31,6 @@ public class VoiceLine extends View {
 
     private float[] mPositions = new float[2];
 
-    private RecorderSampler micDBSampler;
 
     public VoiceLine(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -46,26 +41,6 @@ public class VoiceLine extends View {
             mPositions[0] = typedArray.getFloat(R.styleable.VoiceLine_position_bg, 0.2f);
             mPositions[1] = typedArray.getFloat(R.styleable.VoiceLine_position_fr, 1f);
         }
-
-        // micDBSampler = new AudioRecorderSampler(100);
-
-        micDBSampler = new MediaRecorderSampler(100);
-        micDBSampler.setVolumeLister(new RecorderSampler.VolumeListener() {
-            @Override
-            public void onCalculateVolume(final float volume) {
-                postAnimation(volume);
-            }
-        });
-
-
-    }
-
-    public void startRecord(RecorderSampler.OnStartRecorderError callback) {
-        micDBSampler.startRecorder(callback);
-    }
-
-    public void stopRecord() {
-        micDBSampler.stopRecorder();
     }
 
 
@@ -139,6 +114,12 @@ public class VoiceLine extends View {
         });
         animator.setDuration(1000);
         animator.start();
+    }
+
+    @Override
+    public void onCalculateVolume(float volume) {
+
+        postAnimation(volume);
     }
 
     public class VoiceEvaluator implements TypeEvaluator<Float> {

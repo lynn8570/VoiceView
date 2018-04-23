@@ -1,4 +1,4 @@
-package anim.lynn.voice;
+package anim.lynn.voice.sampler;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -49,7 +49,7 @@ public class AudioRecorderSampler extends RecorderSampler {
     }
 
     @Override
-    void startRecorder(OnStartRecorderError callback) {
+    public void startRecorder(OnStartRecorderError callback) {
         initAudioRecord();
         mTimer = new Timer();
         mAudioRecord.startRecording();
@@ -58,7 +58,7 @@ public class AudioRecorderSampler extends RecorderSampler {
     }
 
     @Override
-    void stopRecorder() {
+    public void stopRecorder() {
         mIsRecording = false;
         mTimer.cancel();
         release();
